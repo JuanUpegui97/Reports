@@ -65,6 +65,8 @@ namespace AnalizadorAuditoria
                         case "-programa":
                         case "-usuario":
                         case "-archivo":
+                        case "-estado":
+
                             //si cumple ambas condiciones se guarda en diccionario en filters
                             if (nextArg != null && !nextArg.StartsWith("-"))
                             {

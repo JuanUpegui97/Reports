@@ -18,17 +18,21 @@ namespace AnalizadorAuditoria.Methods
         /// </summary>
         public List<AuditRecord> FindHistoryByFilters(Dictionary<string, string> filters)
         {
+            //Va almacenar todos los registros encontrados segun la consulta 
             var historyRecords = new List<AuditRecord>();
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+                // Variables para guardar las condiciones, parametros y cuerpo de la consulta
                 string baseQuery = @"SELECT PR_SEQ, PR_STAT, PR_REG_ANTX, PR_REG_ACTX, PR_FECHA, PR_HORA FROM dbo.TXAUDITORIA";
                 var whereConditions = new List<string>();
                 var parameters = new List<SqlParameter>();
 
+                //Va leer todos los parametros que ingreso el usuario para crear la consulta
                 foreach (var filter in filters)
                 {
-                    string key = filter.Key; string value = filter.Value;
+                    string key = filter.Key; 
+                    string value = filter.Value;
                     switch (key)
                     {
                         case "-fechaini": whereConditions.Add("PR_FECHA >= @FechaIni"); parameters.Add(new SqlParameter("@FechaIni", Convert.ToDecimal(value))); break;
@@ -36,15 +40,18 @@ namespace AnalizadorAuditoria.Methods
                         case "-programa": whereConditions.Add("PR_PRG = @Programa"); parameters.Add(new SqlParameter("@Programa", value)); break;
                         case "-usuario": whereConditions.Add("PR_USUARIO = @Usuario"); parameters.Add(new SqlParameter("@Usuario", value)); break;
                         case "-archivo": whereConditions.Add("PR_ARCH = @Archivo"); parameters.Add(new SqlParameter("@Archivo", value)); break;
+                        case "-estado": whereConditions.Add("PR_STAT = @Estado"); parameters.Add(new SqlParameter("@Estado", value)); break;
                     }
                 }
+                //Se arma la consulta completa para traer la ingformacion de BD
                 string finalQuery = baseQuery + (whereConditions.Count > 0 ? " WHERE " + string.Join(" AND ", whereConditions) : "") + " ORDER BY PR_SEQ ASC";
 
+                //Se cogen los parametros y se ejecuta la consulta BD y esta trae la informacion en una lista
                 using (var command = new SqlCommand(finalQuery, connection))
                 {
                     if (parameters.Count > 0) command.Parameters.AddRange(parameters.ToArray());
                     using (var reader = command.ExecuteReader())
-                    { /* ... leer resultados ... */
+                    { 
                         while (reader.Read()) { AddAuditRecord(historyRecords, reader); }
                     }
                 }
@@ -69,7 +76,7 @@ namespace AnalizadorAuditoria.Methods
                     string searchTerm = $"%=\"{value}\"%";
                     command.Parameters.AddWithValue("@SearchTerm", searchTerm);
                     using (var reader = command.ExecuteReader())
-                    { /* ... leer resultados ... */
+                    { 
                         while (reader.Read()) { AddAuditRecord(historyRecords, reader); }
                     }
                 }
