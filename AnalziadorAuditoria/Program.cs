@@ -53,19 +53,27 @@ namespace AnalizadorAuditoria
                 //Se procesan los parametro ingresados 
                 for (int i = 0; i < args.Length; i++)
                 {
+
+
                     //Se divide arg = key y nextArg = valor
                     string arg = args[i].ToLower();
                     string nextArg = (i + 1 < args.Length) ? args[i + 1] : null;
 
-                    // se mira key este en los case 
+                    //Para revisar como estan entrando los parametros
+                    //Console.WriteLine($"arg: {arg}, nextArg: {nextArg}");
+                    //Console.ReadLine();
+
                     switch (arg)
                     {
+                        case "-searchxml":
                         case "-fechaini":
                         case "-fechafin":
                         case "-programa":
-                        case "-usuario":
+                        case "-usuarioadm":
                         case "-archivo":
                         case "-estado":
+                        
+       
 
                             //si cumple ambas condiciones se guarda en diccionario en filters
                             if (nextArg != null && !nextArg.StartsWith("-"))
@@ -89,6 +97,8 @@ namespace AnalizadorAuditoria
                
                 if (filters.Count == 0)
                 {
+
+
                     RegistrarError($"Hacen falta parametros");
                     exitCode = 1; Environment.Exit(exitCode);
                 }
@@ -115,18 +125,19 @@ namespace AnalizadorAuditoria
                 //Se crea un instancia y se envia la cadena conexion BD para realaizar la consulta
                 var historyFinder = new AuditHistoryFinder(connectionString);
 
-                // Logica para buscar por cualquier campo del XML , pero se va usar para USU_COD
-                if (filters.Count == 1 && filters.ContainsKey("-usuario"))
+                // Logica para buscar por cualquier campo del XML 
+                if (filters.Count == 1 && filters.ContainsKey("-searchxml"))
                 {
-                    string userValue = filters["-usuario"];
-                    reportTitle += $" | Historial Usuario (LIKE): {userValue}";
-                    Console.WriteLine($"Buscando historial (LIKE en XML) para '{userValue}'...");
+                    string userValue = filters["-searchxml"];
+                    reportTitle += $" | Historial Usuario : {userValue}";
+                    //Console.WriteLine($"Buscando historial (LIKE en XML) para '{userValue}'...");
                     history = historyFinder.FindHistoryByXmlLikeSearch(userValue);
                     // Generar nombre de archivo PDF
                     pdfFileName = $"Auditoria_Usuario_{userValue}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
                 }
                 else
                 {
+                    
                     string filterDesc = ""; 
                     //Para recorrer todos los parametro enviados por el usuario
                     // Logica para Buscar registro con mas de un parametro

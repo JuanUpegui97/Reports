@@ -31,16 +31,12 @@ namespace AnalizadorAuditoria.Reports
                     {
                         foreach (var record in records)
                         {
-                            // --- He añadido el Archivo al título del registro ---
-                            // Primero obtenemos el valor del archivo (si existe)
-                            string archivo = record.NewAttributes.TryGetValue("PR_ARCH", out var archNew) ? archNew :
-                                             record.OldAttributes.TryGetValue("PR_ARCH", out var archOld) ? archOld : "?";
 
                             col.Item().PaddingTop(15).Column(c =>
                             {
                                 // --- Muestra ID, Operación y Archivo ---
-                                c.Item().Text($"Registro ID: {record.Id} | Operación: {record.GetOperationName()} | Archivo: {archivo}").Bold();
-                                c.Item().Text($"Fecha y Hora: {record.GetFormattedTimestamp()}").FontSize(9).FontColor(Colors.Grey.Medium);
+                                c.Item().Text($"Registro ID: {record.Id} | Operación: {record.GetOperationName()} | Archivo: {record.Archivo}").Bold();
+                                c.Item().Text($"Fecha y Hora: {record.GetFormattedTimestamp()}").FontSize(9).FontColor(Colors.Grey.Medium).Bold();
                             });
 
                             // (El resto del código para la tabla y la lista no cambia)
