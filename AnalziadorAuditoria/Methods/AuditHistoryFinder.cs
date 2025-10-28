@@ -71,7 +71,7 @@ namespace AnalizadorAuditoria.Methods
             {
                 connection.Open();
                 // Esta es la consulta original que busca dentro del texto
-                string query = @"SELECT PR_SEQ, PR_STAT, PR_REG_ACTX, PR_REG_ACTX, PR_FECHA, PR_HORA, PR_ARCH FROM dbo.TXAUDITORIA WHERE PR_REG_ANTX LIKE @SearchTerm OR PR_REG_ACTX LIKE @SearchTerm ORDER BY PR_SEQ ASC";
+                string query = @"SELECT PR_SEQ, PR_STAT, PR_REG_ANTX, PR_REG_ACTX, PR_FECHA, PR_HORA, PR_ARCH FROM dbo.TXAUDITORIA WHERE PR_REG_ANTX LIKE @SearchTerm OR PR_REG_ACTX LIKE @SearchTerm ORDER BY PR_SEQ ASC";
                 using (var command = new SqlCommand(query, connection))
                 {
                     // Construye el término de búsqueda LIKE, ej: %="ALBA"%
