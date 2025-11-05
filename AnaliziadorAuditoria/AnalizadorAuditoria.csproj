@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{38C4CD45-D654-4785-9B75-30572D2E4AB2}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>AnalziadorAuditoria</RootNamespace>
-    <AssemblyName>AnalziadorAuditoria</AssemblyName>
+    <RootNamespace>AnalizadorAuditoria</RootNamespace>
+    <AssemblyName>AnalizadorAuditoria</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -51,10 +51,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>59E80E0051D64B18ED37455BE2C5B31D47FF0954</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>F596C421A38AA22DA5F66593875B60149BC2019D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>AnalziadorAuditoria_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>AnalizadorAuditoria_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -152,6 +152,7 @@
       <HintPath>..\packages\System.ClientModel.1.5.1\lib\netstandard2.0\System.ClientModel.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Common, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.Common.4.3.0\lib\net451\System.Data.Common.dll</HintPath>
@@ -226,7 +227,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AnalziadorAuditoria_TemporaryKey.pfx" />
+    <None Include="AnalizadorAuditoria_TemporaryKey.pfx" />
     <None Include="App.config" />
     <None Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

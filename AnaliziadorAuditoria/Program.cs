@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using AnalizadorAuditoria.Methods; 
 using AnalizadorAuditoria.Reports; 
-using Microsoft.Extensions.Configuration;
+using System.Configuration;
 
 namespace AnalizadorAuditoria
 {
@@ -22,23 +22,36 @@ namespace AnalizadorAuditoria
                 {
 
                     // extrae la cadena de conexion BD de appsettings.json
-                    var configuration = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                        .Build();
+                    //var exePath = AppDomain.CurrentDomain.BaseDirectory;                 
+                    //var configuration = new ConfigurationBuilder()
+                    //    .SetBasePath(exePath)
+                    //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    //    .Build();
                     //la conexion de cadea queda lista para ser utilzida
-                    connectionString = configuration.GetConnectionString("DefaultConnection");
+
+                    //connectionString = configuration.GetConnectionString("DefaultConnection");
+
+
+                    connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"]?.ConnectionString;
+
+
                     if (string.IsNullOrEmpty(connectionString))
                     {
-                        Console.Error.WriteLine("Error Crítico: No se encontró 'DefaultConnection' en appsettings.json.");
-                        exitCode = 1; Environment.Exit(exitCode);
+                        //Console.Error.WriteLine("Error Crítico: No se encontró 'DefaultConnection' en appsettings.json.");
+                        Console.Error.WriteLine("Error Crítico: No se encontró 'DefaultConnection' en App.config.");
+                        exitCode = 300;// No se encontró la cadena de conexión
+                        Console.Error.WriteLine($"Código de salida: {exitCode}");
+                        Environment.Exit(exitCode);
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"\nError al leer la configuración: {ex.Message}");
-                    exitCode = 1; Environment.Exit(exitCode);
+                    exitCode = 301; // Error al leer App.config
+                    Console.Error.WriteLine($"Código de salida: {exitCode}");
+                    Environment.Exit(exitCode);
                 }
+
            
                 //Diccionario para guardar key y valor de los parametros
                 var filters = new Dictionary<string, string>();
@@ -47,7 +60,9 @@ namespace AnalizadorAuditoria
                 if (args.Length == 0)
                 {
                     Console.Error.WriteLine("Error: No se proporcionaron argumentos de filtro.");
-                    exitCode = 1; Environment.Exit(exitCode);
+                    exitCode = 100;
+                    Console.Error.WriteLine($"Código de salida: {exitCode}");
+                    Environment.Exit(exitCode);
                 }
 
                 //Se procesan los parametro ingresados 
@@ -61,7 +76,7 @@ namespace AnalizadorAuditoria
 
                     //Para revisar como estan entrando los parametros
                     //Console.WriteLine($"arg: {arg}, nextArg: {nextArg}");
-                    //Console.ReadLine();
+                    //.ReadLine();
 
                     switch (arg)
                     {
@@ -84,7 +99,9 @@ namespace AnalizadorAuditoria
                             else
                             {
                                 Console.Error.WriteLine($"Error: Falta el valor para el argumento {arg}.");
-                                exitCode = 1; Environment.Exit(exitCode);
+                                exitCode = 101;
+                                Console.Error.WriteLine($"Código de salida: {exitCode}");
+                                Environment.Exit(exitCode);
                             }
                             break;
 
@@ -100,11 +117,13 @@ namespace AnalizadorAuditoria
 
 
                     RegistrarError($"Hacen falta parametros");
-                    exitCode = 1; Environment.Exit(exitCode);
+                    exitCode = 102; // Argumentos pasados pero no válidos
+                    Console.Error.WriteLine($"Código de salida: {exitCode}"); 
+                    Environment.Exit(exitCode);
                 }
 
                 // ruta para generar el pdf 
-                string outputFolder = @"C:\sxg5db\Lst\Reportes"; 
+                string outputFolder = @"\sxg5db\Lst\Reportes"; 
                 string pdfFileName = ""; 
                 string pdfFilePath = "";
 
@@ -114,7 +133,9 @@ namespace AnalizadorAuditoria
                 catch (Exception ex)
                 {
                     RegistrarError($"No se pudo crear el directorio: {ex.Message}");
-                    exitCode = 1; Environment.Exit(exitCode);
+                    exitCode = 201;
+                    Console.Error.WriteLine($"Código de salida: {exitCode}"); 
+                    Environment.Exit(exitCode);
                 }
 
                 
@@ -148,7 +169,7 @@ namespace AnalizadorAuditoria
                         //Arma el nombre para el archivo PDF
                         filterDesc += $"_{filter.Key.Substring(1)}_{filter.Value}"; 
                     }
-                    Console.WriteLine($"Buscando registros con filtros: {reportTitle}");            
+                    //Console.WriteLine($"Buscando registros con filtros: {reportTitle}");            
                     history = historyFinder.FindHistoryByFilters(filters);
                     pdfFileName = $"Auditoria_Filtros{filterDesc}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
                 }
@@ -159,23 +180,29 @@ namespace AnalizadorAuditoria
                 // Procesar resultados y generar PDF enviando 3 parametros
                 if (history.Count == 0)
                 {
-                    Console.WriteLine("No se encontraron registros.");
+                    
+                    RegistrarError($"No se encontraron registros.");
+                    exitCode = 200;
+                    Console.Error.WriteLine($"Código de salida: {exitCode}"); 
+                    Environment.Exit(exitCode);
+
                 }
                 else
                 {
-                    Console.WriteLine($"Se encontraron {history.Count} registros. Generando PDF...");
+                    //Console.WriteLine($"Se encontraron {history.Count} registros. Generando PDF...");
                     var reportGenerator = new PdfReportGenerator();
                     reportGenerator.Generate(history, reportTitle, pdfFilePath);
-                    Console.WriteLine($"PDF generado en: {pdfFilePath}");
+                    //Console.WriteLine($"PDF generado en: {pdfFilePath}");
                 }
             }
             catch (Exception ex)
             {
-                RegistrarError($"Excepción inesperada: {ex.Message}");
+                RegistrarError($"Excepción inesperada: {ex.Message}");             
                 exitCode = 1;
             }
             finally
             {
+                Console.WriteLine($"Código de salida: {exitCode}");
                 Environment.Exit(exitCode);
             }
         }
@@ -183,7 +210,7 @@ namespace AnalizadorAuditoria
         // Método auxiliar MostrarUso 
         static void RegistrarError(string mensaje)
         {
-            string folderPath = @"C:\sxg5db\Lst\Reportes"; // Solo la carpeta
+            string folderPath = @"\sxg5db\Lst\Reportes"; // Solo la carpeta
             string logPath = Path.Combine(folderPath, "error_log.txt"); // Ruta completa del archivo
 
             if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);

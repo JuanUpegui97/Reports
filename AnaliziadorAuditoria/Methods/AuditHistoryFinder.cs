@@ -13,6 +13,17 @@ namespace AnalizadorAuditoria.Methods
             _connectionString = connectionString;
         }
 
+
+        private void UnlockTable(SqlConnection connection)
+        {
+            using (SqlCommand authCmd = new SqlCommand("EXEC sp_set_session_context @key, @value", connection))
+            {
+                authCmd.Parameters.AddWithValue("@key", "clave");
+                authCmd.Parameters.AddWithValue("@value", "ACTIVO");
+                authCmd.ExecuteNonQuery();
+            }
+
+        }
         /// <summary>
         /// Busca en la BD usando un DICCIONARIO de filtros (columnas específicas).
         /// </summary>
@@ -23,6 +34,8 @@ namespace AnalizadorAuditoria.Methods
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+                UnlockTable(connection);
+              
                 // Variables para guardar las condiciones, parametros y cuerpo de la consulta
                 string baseQuery = @"SELECT PR_SEQ, PR_STAT, PR_REG_ANTX, PR_REG_ACTX, PR_FECHA, PR_HORA, PR_ARCH FROM dbo.TXAUDITORIA";
                 var whereConditions = new List<string>();
@@ -70,6 +83,8 @@ namespace AnalizadorAuditoria.Methods
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+                UnlockTable(connection);
+
                 // Esta es la consulta original que busca dentro del texto
                 string query = @"SELECT PR_SEQ, PR_STAT, PR_REG_ANTX, PR_REG_ACTX, PR_FECHA, PR_HORA, PR_ARCH FROM dbo.TXAUDITORIA WHERE PR_REG_ANTX LIKE @SearchTerm OR PR_REG_ACTX LIKE @SearchTerm ORDER BY PR_SEQ ASC";
                 using (var command = new SqlCommand(query, connection))
